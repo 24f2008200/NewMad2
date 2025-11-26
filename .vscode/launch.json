@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flask Debug",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "${relativeFile}",
+        "FLASK_ENV": "development"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload"
+      ],
+      "jinja": true
+    }
+  ]
+}
