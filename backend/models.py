@@ -246,7 +246,7 @@ class ParkingSpot(MyModel):
                 "label": self.label,
                 "status": self.status,
                 "vehicle_number": r.vehicle_number if r else None,
-                "start_time": dateFormat(r.start_time) if r else None,
+                "occupied_since": dateFormat(r.start_time) if r else None,
                 "user_name": u.name if u else None,
                 "driver_contact": r.driver_contact if r else None,
                 "driver_name": r.driver_name if r else None,
@@ -338,7 +338,33 @@ def model_to_dict(obj):
             result[col.name] = value
     return result
 
+def model_to_dict_hybrid(obj):
+    result = {}
 
+    # 1. Serialize regular columns
+    for col in obj.__table__.columns:
+        value = getattr(obj, col.name)
+        if isinstance(value, datetime):
+            result[col.name] = value.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            result[col.name] = value
+
+    # 2. Serialize hybrid properties & extra fields
+    extras = getattr(obj, "__serialize_extras__", [])
+    for name in extras:
+        try:
+            value = getattr(obj, name)
+
+            # handle datetime from hybrid property
+            if isinstance(value, datetime):
+                result[name] = value.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                result[name] = value
+
+        except Exception as e:
+            result[name] = None  # optional fallback
+
+    return result
 def dateFormat(value):
     return value.strftime("%Y-%m-%d %H:%M") if value else None
 

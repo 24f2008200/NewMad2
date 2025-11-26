@@ -83,11 +83,11 @@
             <RouterLink class="nav-link" to="/user/summary">Summary</RouterLink>
           </li>
           <li>
-            <Button @click="startExport">Export CSV</Button>
+            <Button class="btn btn-profile" @click="startExport">Export CSV</Button>
             <div v-if="exportStatus">
               Status: {{ exportStatus }}
             </div>
-            <a v-if="downloadUrl" :href="downloadUrl">Download CSV</a>
+            <a v-if="downloadUrl" :href="downloadUrl" download="reservations.csv"  class="btn btn-link mt-2">Download CSV</a>
 
           </li>
 
@@ -158,6 +158,8 @@ const { isLoggedIn, isAdmin, logout, userName } = useAuth();
 const userId = ref();
 const show = ref(false);
 let currentUserIsAdmin = ref(false);
+const exportStatus = ref("");
+const downloadUrl = ref("");
 
 const searchStore = useSearchStore();
 // const searchType = searchStore.searchType; 
@@ -235,6 +237,75 @@ async function doLogout() {
   logout();
   router.push("/");
 }
+async function startExport() {
+  exportStatus.value = "Fetching data...";
+  downloadUrl.value = "";
+
+  try {
+    const json = await apiClient.post("/user/reservations");
+
+    // if (!res.ok) {
+    //   exportStatus.value = "Error fetching data";
+    //   return;
+    // }
+
+    // const json = await res.json();
+
+    if (!Array.isArray(json) || json.length === 0) {
+      exportStatus.value = "No data to export";
+      return;
+    }
+
+    exportStatus.value = "Converting to CSV...";
+
+    // Build CSV
+    const csv = convertToCSV(json);
+
+    // Blob URL
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    downloadUrl.value = URL.createObjectURL(blob);
+
+    exportStatus.value = "Ready to download";
+
+  } catch (err) {
+    console.error("CSV Export Error:", err);
+    exportStatus.value = "Failed to export";
+  }
+}
+
+// function convertToCSV(data) {
+//   const headers = Object.keys(data[0]);
+//   const csvRows = [];
+
+//   // Add headers
+//   csvRows.push(headers.join(","));
+
+//   // Add rows
+//   for (const row of data) {
+//     const values = headers.map(header => {
+//       const escaped = ("" + row[header]).replace(/"/g, '\\"');
+//       return `"${escaped}"`;
+//     });
+//     csvRows.push(values.join(","));
+//   }
+
+//   return csvRows.join("\n");
+// }
+
+function convertToCSV(data) {
+  const headers = Object.keys(data[0]);
+
+  const escape = (val) =>
+    '"' + String(val ?? "").replace(/"/g, '""') + '"';
+
+  const rows = [
+    headers.join(","),                                // header row
+    ...data.map(row => headers.map(h => escape(row[h])).join(","))  // data rows
+  ];
+
+  return rows.join("\n");
+}
+
 </script>
 
 <style scoped>

@@ -19,6 +19,7 @@ from backend.models import (
     Reservation,
     User,
     dateFormat,
+    model_to_dict_hybrid,
     search_all,
     ReminderJob,
     model_to_dict
@@ -30,8 +31,11 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
 api = Api(admin_bp)
 
 
-def serialize_list(queryset):
-    return [model_to_dict(obj) for obj in queryset]
+def serialize_list(queryset,hybrid=False):
+    if hybrid:
+        return [model_to_dict_hybrid(obj) for obj in queryset]
+    else:
+        return [model_to_dict(obj) for obj in queryset]
 
 
 class LotsResource(Resource):
@@ -359,7 +363,7 @@ class AdminReportResource(Resource):
         if isinstance(rr, bool):
             query = query.filter(User.receive_reminders == rr)
 
-        return serialize_list(query.all()), 200
+        return serialize_list(query.all(), hybrid=True), 200
 
     def _reminder_logs(self, data):
         page = int(data.get("page", 1))

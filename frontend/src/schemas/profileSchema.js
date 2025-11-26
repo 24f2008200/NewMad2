@@ -3,7 +3,7 @@ export const profileSchema = {
     { id: "profile", title: "Profile Info" },
     { id: "ops", title: "Operational Data" }
   ],
-
+ 
   sections: [
     {
       id: "profile",

@@ -40,7 +40,7 @@ const userCols = [
   { key: "mobile", label: "Mobile", type: "number" },
   { key: "address", label: "Address", type: "text" },
   { key: "email", label: "E-Mail", type: "text" },
-  { key: "rev", label: "Revenue" },
+  { key: "billing", label: "Revenue" },
   { key: "last_login", label: "Last Seen" },
   { key: "edit", label: "Edit", type: "action" },
 ];
