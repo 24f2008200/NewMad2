@@ -28,13 +28,13 @@
                         <div v-for="section in activeSections" :key="section.id" class="mb-3">
                             <h6 v-if="section.label" class="border-bottom pb-1">{{ section.label }}</h6>
 
-
-                            <div class="row g-3">
+will be replaced
+                            <!-- <div class="row g-3">
                                 <div v-for="field in visibleFields(section)" :key="field.model">
                                     <FieldRenderer :field="field" :errors="validationErrors[field.model] || []"
                                         v-model="form[field.model]" />
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
 
@@ -85,7 +85,7 @@ const form = reactive({});
 const activeTab = ref(null);
 const validationErrors = ref({});
 
-
+console.log("DynamicFormModal props:", props);
 // Filter sections based on active tab
 const activeSections = computed(() => {
     if (!props.schema.tabs) return props.schema.sections;

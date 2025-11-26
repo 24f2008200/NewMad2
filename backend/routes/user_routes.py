@@ -98,6 +98,13 @@ class SpotActivityResource(Resource):
 
         r.end_time = utcnow()
         r.spot.status = "A"
+
+        if r.start_time.tzinfo is None:
+            r.start_time = r.start_time.replace(tzinfo=timezone.utc)
+        if r.end_time.tzinfo is None:
+            r.end_time = r.end_time.replace(tzinfo=timezone.utc)
+            
+        print(r.start_time, r.end_time)
         dur_hrs = (r.end_time - r.start_time).total_seconds() / 3600
         r.parking_fee = round(dur_hrs * r.spot.lot.price, 2)
         db.session.commit()
@@ -328,7 +335,7 @@ class UserReservationsResource(Resource):
             reservations = [r for r in reservations if r.start_time >= dt_start]
         end_date = data.get("endDate")
         if end_date:
-            dt_end = datetime.strptime(end_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            dt_end = datetime.strptime(end_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)+ timedelta(days=1)
             reservations = [r for r in reservations if r.start_time <= dt_end]
 
         result = []

@@ -140,7 +140,7 @@
 <script setup>
 import CSVExportCard from "@/components/CSVExportCard.vue"
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 import { useAuth } from "../stores/auth";
 import { useSearchStore } from "../stores/search";
 import { apiFetch } from "@/api";

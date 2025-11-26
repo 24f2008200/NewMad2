@@ -1,7 +1,12 @@
 export const registerSchema = {
+    tabs: [
+    { id: "core", title: "Profile Info" },
+
+  ],
   sections: [
     {
       id: "core",
+      tab: "core",
       label: "User Registration",
       fields: [
         { model: "name", label: "Name", type: "text", rules: ["required"] },
@@ -22,7 +27,7 @@ export const registerSchema = {
         { model: "reminder_time", label: "Reminder Time", type: "text" },
         { model: "google_chat_hook", label: "Google Chat Hook", type: "url" },
 
-        // 🔥 Replace "password" with password-group
+        //  Replace "password" with password-group
         {
           model: "password_group",
           label: "Password",

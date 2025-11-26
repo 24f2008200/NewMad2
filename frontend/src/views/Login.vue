@@ -18,7 +18,8 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
+import { router } from "@/router";
 import { useAuth } from "../stores/auth";
 import { apiFetch } from "@/api";
 import { useSearchStore } from "../stores/search";
@@ -27,7 +28,7 @@ const { login } = useAuth();
 const email = ref("");
 const password = ref("");
 const error = ref(null);
-const router = useRouter();
+// const router = useRouter();
 const searchStore = useSearchStore();
 
 const today = new Date()

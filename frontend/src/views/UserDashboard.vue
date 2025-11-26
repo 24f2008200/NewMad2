@@ -207,11 +207,11 @@ async function fetchReservations() {
 
 }
 
-// Release a spot
+// Release a spot headers: { "Content-Type": "application/json" },
 async function releaseSpot(reservationId) {
   const res = await apiFetch(`/api/user/spots`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token.value}` },
+    headers: { "Content-Type": "application/json" , Authorization: `Bearer ${token.value}` },
     body: JSON.stringify({
       "action": "release",
       "reservation_id": reservationId

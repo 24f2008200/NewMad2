@@ -23,7 +23,8 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
+import { router } from "@/router";
 import { useAuth } from "@/stores/auth";
 import { useSearchStore } from "@/stores/search";
 import SearchBox from "./SearchBox.vue";
@@ -32,7 +33,7 @@ import UserProfileModal from "./UserProfileModal.vue";
 
 const { isLoggedIn, isAdmin, logout, userName } = useAuth();
 const searchStore = useSearchStore();
-const router = useRouter();
+// const router = useRouter();
 
 const showProfile = ref(false);
 const profileUserId = ref(null);

@@ -32,7 +32,7 @@ const routes = [
   { path: "/:pathMatch(.*)*", redirect: "/" }
 ];
 
-const router = createRouter({
+export  const router = createRouter({
   history: createWebHistory(),
   routes,
 });

@@ -11,6 +11,9 @@
           <li class="nav-item">
             <RouterLink class="nav-link" to="/login">Login</RouterLink>
           </li>
+          <!-- <li>
+            <RegisterCopyNew   @closed="show = false">New Register </RegisterCopyNew>
+          </li> -->
           <li class="nav-item">
             <RouterLink class="nav-link" to="/register">Register</RouterLink>
           </li>
@@ -102,15 +105,15 @@
           </button>
         </li>
       </ul> -->
-        <div class="nav">
+      <div class="nav">
 
-<div style="display:flex; gap:10px; align-items:center">
-      <input type="date" v-model="startDate" class="form-control search-input"/>
-      <input type="date" v-model="endDate" class="form-control search-input"/>
+        <div style="display:flex; gap:10px; align-items:center">
+          <input type="date" v-model="startDate" class="form-control search-input" />
+          <input type="date" v-model="endDate" class="form-control search-input" />
 
-      <!-- <button class="btn btn-search"  @click="apply">Apply</button> -->
-    </div>
-  </div>
+          <!-- <button class="btn btn-search"  @click="apply">Apply</button> -->
+        </div>
+      </div>
       <form class="d-flex align-items-center gap-3" role="search" @submit.prevent="onSearch">
         <!-- Admin-only search bar -->
         <template v-if="isAdmin">
@@ -143,11 +146,13 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
+import { router } from "@/router";
 import { useAuth } from "../stores/auth";
 import { useSearchStore } from "../stores/search";
 import apiClient from '@/apiClient';
 import UserProfileModal from '../components/UserProfileModal.vue';
+import RegisterCopyNew from "./RegisterCopyNew.vue";
 const { isLoggedIn, isAdmin, logout, userName } = useAuth();
 
 const userId = ref();
@@ -156,7 +161,8 @@ let currentUserIsAdmin = ref(false);
 
 const searchStore = useSearchStore();
 // const searchType = searchStore.searchType; 
-const router = useRouter();
+// const router = useRouter();
+
 const today = new Date()
 const endDate = ref(today.toISOString().substring(0, 10))
 
@@ -177,22 +183,23 @@ const welcomeText = computed(() => {
 })
 
 watch([startDate, endDate], () => {
-  apply();    
+  apply();
 });
 
 watch(
   () => searchStore.searchType,
-  (newVal) => { console.log("Search type changed to", newVal);
+  (newVal) => {
+    console.log("Search type changed to", newVal);
     router.push("/views"); // navigate once type changes
     searchStore.triggerNavbarAction(); // Notify views to update
   }
 );
 function setSearchType(type) {
-   searchStore.setSearchType(type); 
+  searchStore.setSearchType(type);
   //searchStore.searchType = type;
   console.log("Set search type to", type);
   // router.push("/views");
- // searchStore.triggerNavbarAction(); // Notify views to update
+  // searchStore.triggerNavbarAction(); // Notify views to update
 }
 
 function openProfile() {
