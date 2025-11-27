@@ -3,10 +3,12 @@
     <table class="table table-striped align-middle text-center">
       <thead>
         <tr>
-          <th v-for="col in visibleColumns" :key="col.key" class="px-2 py-2">
+          <th v-for="col in columns" :key="col.key" class="px-2 py-2">
             {{ col.label }}
-
             <div v-if="enableFilters" class="filters">
+              <!-- <div v-for="col in columns" :key="col.key" class="mb-2"> -->
+              <!-- <label class="me-2">{{ col.label || col.key }}</label> -->
+
               <!-- Dropdown filter -->
               <select v-if="col.filterType === 'select'" v-model="filters[col.key]"
                 class="form-select form-select-sm w-auto d-inline-block">
@@ -20,25 +22,25 @@
               <input v-else v-model="filters[col.key]" type="text"
                 class="form-control form-control-sm w-auto d-inline-block"
                 :placeholder="`Filter by ${col.label || col.key}`" />
+              <!-- </div> -->
             </div>
           </th>
         </tr>
       </thead>
-
       <tbody>
         <tr v-for="row in filteredRows" :key="row.id">
-          <td v-for="col in visibleColumns" :key="col.key" class="px-2 py-1">
+          <!-- <td v-for="col in columns" :key="col.key" class="px-2 py-1">
+            <slot :name="col.key" :row="row">{{ row[col.key] }}</slot>
+          </td> -->
+          <td v-for="col in columns" :key="col.key" class="px-2 py-1">
             <template v-if="col.type === 'action'">
               <button class="btn btn-sm btn-primary me-1"
                 @click="emit('action-click', { action: col.key, id: row.id, row })">
                 {{ col.label }}
               </button>
             </template>
-
             <template v-else>
-              <slot :name="col.key" :row="row">
-                {{ row[col.key] }}
-              </slot>
+              <slot :name="col.key" :row="row">{{ row[col.key] }}</slot>
             </template>
           </td>
         </tr>
@@ -57,7 +59,7 @@ const props = defineProps({
   rows: { type: Array, required: true },
   enableFilters: { type: Boolean, default: true }
 })
-
+ 
 
 const filters = ref({})
 
@@ -77,22 +79,9 @@ const filteredRows = computed(() => {
         // exact match for dropdown
         return value === filter.toLowerCase()
       } else {
-        const f = String(filter).toLowerCase().trim();
-
-        // 1. "~" → only empty/null
-        if (f === "~") {
-          return rawValue === null || rawValue === undefined || rawValue === "";
-        }
-
-        // 2. "!~" → NOT empty/null
-        if (f === "!~") {
-          return !(rawValue === null || rawValue === undefined || rawValue === "");
-        }
-
-        // 3. "!abc" → value does NOT contain "abc"
-        if (f.startsWith("!")) {
-          const target = f.substring(1);
-          return !value.includes(target);
+        // special case: '~' means "pick only None/empty"
+        if (filter === "~") {
+          return rawValue === null || rawValue === undefined || rawValue === ""
         }
         // substring match for free typing
         return value.includes(filter.toLowerCase())
@@ -101,9 +90,6 @@ const filteredRows = computed(() => {
   )
 })
 
-const visibleColumns = computed(() =>
-  props.columns.filter(col => !col.noshow)
-);
 
 
 // helper 
@@ -123,7 +109,6 @@ function uniqueValues(key) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
-  /* Change based on your design */
+  max-width: 150px; /* Change based on your design */
 }
 </style>

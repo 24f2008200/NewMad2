@@ -84,10 +84,14 @@
           </li>
           <li>
             <Button class="btn btn-profile" @click="startExport">Export CSV</Button>
-            <div v-if="exportStatus">
-              Status: {{ exportStatus }}
-            </div>
-            <a v-if="downloadUrl" :href="downloadUrl" download="reservations.csv"  class="btn btn-link mt-2">Download CSV</a>
+            <!-- <template v-if="exportStatus">
+              <span>Status: {{ exportStatus }}</span>
+            </template> -->
+            <a v-if="downloadUrl" :href="downloadUrl" download="reservations.csv" class="btn btn-link mt-2"
+              @click="clearDownloadUrl">
+              Download CSV
+            </a>
+
 
           </li>
 
@@ -165,8 +169,11 @@ const searchStore = useSearchStore();
 // const searchType = searchStore.searchType; 
 // const router = useRouter();
 
-const today = new Date()
-const endDate = ref(today.toISOString().substring(0, 10))
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const endDate = ref(tomorrow.toISOString().substring(0, 10));
 
 const start = new Date()
 start.setMonth(start.getMonth() - 1)
@@ -220,22 +227,18 @@ const onSearch = () => {
 //   searchStore.triggerNavbarAction();
 // }
 async function doLogout() {
+  router.push({ path: "/login", force: true });
+  console.log("Logging out...");
   apiClient.post("/auth/logout", {}, { withCredentials: true }).catch((e) => {
     console.warn("Logout request failed:", e);
   });
-  // try {
-
-  //   await apiFetch("/api/auth/logout", {
-  //     method: "POST",
-  //     credentials: "include",
-  //   });
-  // } catch (e) {
-  //   console.warn("Logout request failed:", e);
-  // }
+  localStorage.removeItem("current_user");
   localStorage.removeItem("access_token");
   localStorage.removeItem("is_admin");
   logout();
-  router.push("/");
+  await router.push("/login");  // ensures redirect happens
+  
+
 }
 async function startExport() {
   exportStatus.value = "Fetching data...";
@@ -272,6 +275,15 @@ async function startExport() {
     exportStatus.value = "Failed to export";
   }
 }
+function clearDownloadUrl() {
+  // let the browser start the download first
+  setTimeout(() => {
+    URL.revokeObjectURL(downloadUrl.value); // optional cleanup
+    downloadUrl.value = "";
+    exportStatus.value = "";
+  }, 1000); // small delay so download starts
+}
+
 
 // function convertToCSV(data) {
 //   const headers = Object.keys(data[0]);

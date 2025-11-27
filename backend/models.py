@@ -331,12 +331,20 @@ class ReminderJob(MyModel):
 def model_to_dict(obj):
     result = {}
     for col in obj.__table__.columns:
-        value = getattr(obj, col.name)
+        col_name = col.name
+        value = getattr(obj, col_name)
+
+        if col_name.lower() == "password":   #  hide password
+            result[col_name] = ""
+            continue
+
         if isinstance(value, datetime):
-            result[col.name] = value.strftime("%Y-%m-%d %H:%M:%S")
+            result[col_name] = value.strftime("%Y-%m-%d %H:%M:%S")
         else:
-            result[col.name] = value
+            result[col_name] = value
+
     return result
+
 
 def model_to_dict_hybrid(obj):
     result = {}
@@ -344,6 +352,11 @@ def model_to_dict_hybrid(obj):
     # 1. Serialize regular columns
     for col in obj.__table__.columns:
         value = getattr(obj, col.name)
+        
+        if col.name.lower() == "password":   #  hide password
+            result[col.name] = ""
+            continue
+
         if isinstance(value, datetime):
             result[col.name] = value.strftime("%Y-%m-%d %H:%M:%S")
         else:

@@ -67,15 +67,16 @@
                 <td>{{ lot.address }}</td>
                 <td>{{ lot.available_spots }}</td>
                 <td>
-                  <button class="btn btn-sm btn-primary" :disabled="lot.available_spots === 0"
+                  <button class="btn btn-sm btn-primary me-2" :disabled="lot.available_spots === 0"
                     @click="openBookingModal(lot)">
                     Book
-                  </button><h6>   </h6>
-                  <button class="btn btn-sm btn-secondary" 
-                    @click="closeDropdown()">
+                  </button>
+
+                  <button class="btn btn-sm btn-secondary" @click="closeDropdown()">
                     Close
                   </button>
                 </td>
+
               </tr>
             </tbody>
           </table>
@@ -211,7 +212,7 @@ async function fetchReservations() {
 async function releaseSpot(reservationId) {
   const res = await apiFetch(`/api/user/spots`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" , Authorization: `Bearer ${token.value}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token.value}` },
     body: JSON.stringify({
       "action": "release",
       "reservation_id": reservationId

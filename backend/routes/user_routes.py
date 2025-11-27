@@ -300,6 +300,7 @@ class UserProfileResource(Resource):
             return {"error": "User not found"}, 404
 
         data = request.get_json() or {}
+        print(data)
         user.name = data.get("name", user.name)
         user.email = data.get("email", user.email)
         user.mobile = data.get("mobile", user.mobile)
