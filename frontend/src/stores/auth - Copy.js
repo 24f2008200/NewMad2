@@ -5,7 +5,7 @@ const isAdmin = ref(localStorage.getItem('is_admin') === 'true');
 const userName = ref(localStorage.getItem('user_name') || '');
 const userId = ref(localStorage.getItem('user_id') || '');
 
-export function useAuth() {
+export function useAuthStore() {
   const isLoggedIn = computed(() => token.value !== null);
 
   function login(data) {

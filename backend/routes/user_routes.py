@@ -273,7 +273,7 @@ class PinCodesResource(Resource):
     def get(self):
         pin_codes = db.session.query(ParkingLot.pin_code).distinct().all()
         return [p[0] for p in pin_codes], 200
-
+ 
 
 class UserProfileResource(Resource):
     method_decorators = [auth_required]
@@ -291,7 +291,11 @@ class UserProfileResource(Resource):
             "receive_reminders": user.receive_reminders,
             "reminder_time": user.reminder_time,
             "google_chat_webhook": user.google_chat_webhook,
-            
+            "total_reservations": user.total_reservations,
+            "active_reservations": user.active_reservations,
+            "last_login": dateFormat(user.last_login),
+            "billing": user.billing,
+            "last_active": dateFormat(user.last_active),
 
         }, 200
     def put(self, user_id):

@@ -33,9 +33,15 @@ def create_app(use_redis = False, large_data = 0):
             raise ValueError(f"Invalid integer for DATA_SIZE: {env_large_data}")
 
     app = Flask(__name__, instance_relative_config=True)
-    # print (large_data)
+    # print (large_data) 
+    origins = [
+    os.getenv("CORS_ORIGIN_1"),
+    os.getenv("CORS_ORIGIN_2"),
+    os.getenv("CORS_ORIGIN_3"),
+    os.getenv("CORS_ORIGIN_4"),
+]
     CORS(app,
-     resources={r"/*": {"origins": {"http://localhost:5173", "http://127.0.0.1:5173"}}},
+     resources={r"/*": {"origins": origins}},
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization", "X-Requested-With"])
     if large_data == 2:
@@ -50,7 +56,7 @@ def create_app(use_redis = False, large_data = 0):
     # Config
     app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "devsecret")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 3600)))
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
     app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "super-secret-key")
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(INSTANCE_DIR, data_base)}"

@@ -117,15 +117,17 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { useAuth } from "../stores/auth";
+import { useAuthStore} from "../stores/auth";
 import * as bootstrap from "bootstrap";
 import { apiFetch } from "@/api";
 import apiClient from '@/apiClient';
 import DataTable from "@/components/DataTable.vue";
 import { useSearchStore } from "../stores/search";
+import { storeToRefs } from "pinia";
+const auth = useAuthStore();
+const { isLoggedIn, isAdmin, userName, userId: uid, token } = storeToRefs(auth);
 const searchStore = useSearchStore();
 
-const { token } = useAuth();
 const reservationColumns = [
   { key: "lot_prefix", label: "ID", filterType: "select", type: "noedit" },
   { key: "spot_id", label: "Location", type: "noedit" },

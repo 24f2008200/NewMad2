@@ -29,9 +29,10 @@ export const profileSchema = {
       tab: "ops",
       label: "User Activity",
       fields: [
-        { model: "reservation_count", label: "Reservations", type: "number" },
-        { model: "active_reservation", label: "Active", type: "text" },
-        { model: "last_login", label: "Last Login", type: "text" }
+        { model: "total_reservations", label: "Reservations", type: "number" },
+        { model: "active_reservations", label: "Active", type: "text" },
+        { model: "billing", label: "Billing", type: "text" },
+        { model: "last_active", label: "Last Active", type: "text" }
       ]
     }
   ]

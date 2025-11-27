@@ -51,10 +51,13 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useAuth } from "../stores/auth";
+import { useAuthStore} from "../stores/auth";
 import LineChart from "../components/LineChart.vue";
 import { apiFetch } from "@/api";
+import { storeToRefs } from "pinia";
 
+const auth = useAuthStore();
+const { isLoggedIn, isAdmin, userName, userId: uid, token } = storeToRefs(auth);
 
 import { Pie, Bar, Line } from "vue-chartjs"
 import { CategoryScale, LinearScale, BarElement, LineElement } from 'chart.js';
@@ -66,7 +69,7 @@ const revenueData = ref(null)
 const reservationData = ref(null)
 
 
-const { token } = useAuth();
+// const { token } = useAuthStore();
 const summary = ref({});
 
 async function fetchSummary() {

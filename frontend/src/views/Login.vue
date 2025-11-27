@@ -20,10 +20,13 @@
 import { ref } from "vue";
 // import { useRouter } from "vue-router";
 import { router } from "@/router";
-import { useAuth } from "../stores/auth";
-import { apiFetch } from "@/api";
+import { useAuthStore} from "../stores/auth";
+import apiClient from "@/apiClient";
 import { useSearchStore } from "../stores/search";
-const { login } = useAuth();
+import { storeToRefs } from "pinia";
+// const auth = useAuthStore();
+// const { isLoggedIn, isAdmin, userName, userId: uid, token, login } = storeToRefs(auth);
+const { login } = useAuthStore();
 
 const email = ref("");
 const password = ref("");
@@ -45,26 +48,30 @@ async function doLogin() {
   searchStore.endDate = endDate.value;
   console.log("Start Date:", searchStore.startDate);
   try {
-    const res = await apiFetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include", // send cookies/session if backend sets them
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }),
+    const data =await apiClient.post("/auth/login", {
+      email: email.value,
+      password: password.value,
     });
+    // const res = await apiFetch("/api/auth/login", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   credentials: "include", // send cookies/session if backend sets them
+    //   body: JSON.stringify({
+    //     email: email.value,
+    //     password: password.value,
+    //   }),
+    // });
 
 
 
     // Try parsing JSON safely
-    const data = await res.json().catch(() => null);
+    // const data = await res.json().catch(() => null);
 
 
-    if (!res.ok) {
-      error.value = data?.message || "Invalid login credentials";
-      return;
-    }
+    // if (!res.ok) {
+    //   error.value = data?.message || "Invalid login credentials";
+    //   return;
+    // }
 
     login(data);
     localStorage.setItem("access_token", data.access_token);

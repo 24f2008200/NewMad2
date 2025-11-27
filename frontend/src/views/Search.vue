@@ -14,13 +14,15 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { useAuth } from "../stores/auth";
+import { useAuthStore} from "../stores/auth";
 import { watch } from "vue";
 import { apiFetch } from "@/api";
 import DataTable from "@/components/DataTable.vue";
 import RowEditor from "@/components/RowEditor.vue";
 import { useSearchStore } from "../stores/search";
-
+import { storeToRefs } from "pinia";
+const auth = useAuthStore();
+const { isLoggedIn, isAdmin, userName, userId: uid, token } = storeToRefs(auth);
 
 import { Pie, Bar, Line } from "vue-chartjs"
 import { CategoryScale, LinearScale, BarElement, LineElement } from 'chart.js';
@@ -47,7 +49,7 @@ const revenueData = ref(null)
 const reservationData = ref(null)
 
 
-const { token } = useAuth();
+
 const summary = ref({});
 
 

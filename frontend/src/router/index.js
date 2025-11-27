@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
@@ -10,6 +11,9 @@ import Search from "../views/Search.vue";
 import Summary from "../views/Summary.vue";
 import Profile from "../views/Profile.vue";
 import UserSummary from "../views/UserSummary.vue";
+// import { storeToRefs } from "pinia";
+// const auth = useAuthStore();
+// const { isLoggedIn, isAdmin, userName, userId: uid, token } = storeToRefs(auth);
 
 const routes = [
   // Public routes
@@ -41,24 +45,26 @@ export  const router = createRouter({
 // Global Navigation Guard
 // ----------------------------------------------------
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("access_token");
-  const isAdmin = localStorage.getItem("is_admin") === "true";
+  const auth = useAuthStore();
 
-  // User not logged in → must login
-  if (to.meta.requiresAuth && !token) {
+  // require login
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return next("/login");
   }
 
-  // Role-based protection
-  if (to.meta.role === "admin" && !isAdmin) {
-    return next("/user"); // normal user gets redirected
+  // admin-only route
+  if (to.meta.role === "admin" && !auth.isAdmin) {
+    return next("/user");
   }
 
-  if (to.meta.role === "user" && isAdmin) {
-    return next("/admin"); // admin cannot access user-only pages
+  // user-only route
+  if (to.meta.role === "user" && auth.isAdmin) {
+    return next("/admin");
   }
 
   next();
 });
-
+router.afterEach((to) => {
+  console.log(" Navigated to:", to.fullPath);
+});
 export default router;

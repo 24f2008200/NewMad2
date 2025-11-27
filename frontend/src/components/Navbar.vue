@@ -152,12 +152,13 @@
 import { computed, ref, watch } from "vue";
 // import { useRouter } from "vue-router";
 import { router } from "@/router";
-import { useAuth } from "../stores/auth";
+import { useAuthStore} from "../stores/auth";
 import { useSearchStore } from "../stores/search";
 import apiClient from '@/apiClient';
 import UserProfileModal from '../components/UserProfileModal.vue';
-import RegisterCopyNew from "./RegisterCopyNew.vue";
-const { isLoggedIn, isAdmin, logout, userName } = useAuth();
+import { storeToRefs } from "pinia";
+const auth = useAuthStore();
+const { isLoggedIn, isAdmin, userName, userId: uid } = storeToRefs(auth);
 
 const userId = ref();
 const show = ref(false);
@@ -166,7 +167,7 @@ const exportStatus = ref("");
 const downloadUrl = ref("");
 
 const searchStore = useSearchStore();
-// const searchType = searchStore.searchType; 
+// const searchType = searchStore.searchType;  
 // const router = useRouter();
 
 const today = new Date();
@@ -212,7 +213,8 @@ function setSearchType(type) {
 }
 
 function openProfile() {
-  const { isAdmin, userName, userId: uid } = useAuth()
+  //const { isAdmin, userName, userId: uid } = useAuthStore()
+  console.log("Opening profile for userId:", uid.value, "isAdmin:", isAdmin.value);
   userId.value = parseInt(uid.value)
   currentUserIsAdmin.value = isAdmin.value
   show.value = true
@@ -226,19 +228,25 @@ const onSearch = () => {
 // function onSearchByClick() {
 //   searchStore.triggerNavbarAction();
 // }
+// async function doLogout() {
+//   router.push({ path: "/login", force: true });
+//   console.log("Logging out...");
+//   apiClient.post("/auth/logout", {}, { withCredentials: true }).catch((e) => {
+//     console.warn("Logout request failed:", e);
+//   });
+//   localStorage.removeItem("current_user");
+//   localStorage.removeItem("access_token");
+//   localStorage.removeItem("is_admin");
+//   logout();
+//   await router.push("/login");  // ensures redirect happens
+//   }
 async function doLogout() {
-  router.push({ path: "/login", force: true });
-  console.log("Logging out...");
-  apiClient.post("/auth/logout", {}, { withCredentials: true }).catch((e) => {
-    console.warn("Logout request failed:", e);
-  });
-  localStorage.removeItem("current_user");
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("is_admin");
-  logout();
-  await router.push("/login");  // ensures redirect happens
-  
+  apiClient.post("/auth/logout").catch(() => { });
 
+  const auth = useAuthStore();
+  auth.logout();
+
+  await router.replace("/login");
 }
 async function startExport() {
   exportStatus.value = "Fetching data...";

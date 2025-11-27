@@ -17,7 +17,7 @@
 import { computed } from "vue";
 import DynamicFormModal from "@/components/DynamicFormModal.vue";
 import { profileSchema } from "@/schemas/profileSchema";
-import { useAuth } from "@/stores/auth";
+import { useAuthStore} from "@/stores/auth";
 
 const props = defineProps({
   userId: { type: Number, default: null },   // null = self
@@ -26,7 +26,7 @@ const props = defineProps({
 
 const emit = defineEmits(["closed", "updated"]);
 
-const auth = useAuth();
+const auth = useAuthStore();
 const currentUserIsAdmin = computed(() => auth.isAdmin);
 
 // ⭐ FIX: use your original backend structure

@@ -436,7 +436,7 @@ class AdminReportResource(Resource):
         # return {
         #     "page": page_obj.page,
         #     "pages": page_obj.pages,
-        #     "total": page_obj.total,
+        #     "total": page_obj.total, 
         #     "items": logs,
         # }, 200
 

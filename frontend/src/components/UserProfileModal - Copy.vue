@@ -119,7 +119,7 @@
 <script setup>
 import { reactive, ref, watch, computed } from "vue";
 import { apiFetch } from "@/api";
-import { useAuth } from "../stores/auth";
+import { useAuthStore} from "../stores/auth";
 const props = defineProps({
   userId: { type: Number, default: null }, // null = self
   show: { type: Boolean, default: false },
