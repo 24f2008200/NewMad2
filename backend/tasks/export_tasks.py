@@ -1,7 +1,7 @@
 import csv
 import os
 from datetime import datetime
-from backend.extensions import  db, redis_conn
+from backend.extensions import  db,cache
 from backend.celery_app import celery
 from backend.models import Reservation, ParkingSpot, ParkingLot
 

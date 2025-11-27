@@ -14,3 +14,7 @@ celery
 flask-caching
 reportlab
 requests
+boto3
+croniter
+requests
+sqlalchemy-utils

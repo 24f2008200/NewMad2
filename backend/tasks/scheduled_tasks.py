@@ -6,7 +6,7 @@ import calendar
 from datetime import datetime, timedelta, timezone
 from jinja2 import Template
 from celery import shared_task
-from celery_app import celery
+from backend.celery_app import celery
 from backend.app import create_app, db,my_app
 from backend.models import User, ParkingLot, Reservation,ReminderJob
 from backend.tasks.mail_utils import send_email

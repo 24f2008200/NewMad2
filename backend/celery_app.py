@@ -1,39 +1,41 @@
-# celery_app.py
+# backend/celery_app.py
+
+import os
 from celery import Celery
-from celery.schedules import crontab
 
-def make_celery(app_name=__name__):
-    broker = "redis://localhost:6379/0"
-    backend = "redis://localhost:6379/1"
-    celery = Celery(app_name, broker=broker, backend=backend)
-    celery.conf.update(
-        task_serializer='json',
-        accept_content=['json'],
-        result_serializer='json',
-        timezone='Asia/Kolkata',
-        enable_utc=False,
-    )
-    return celery
+# Redis config
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
 
-celery = make_celery()
+# Create Celery app
+celery = Celery(
+    "backend",
+    broker=CELERY_BROKER_URL,
+    backend=CELERY_RESULT_BACKEND,
+)
 
+# Autodiscover tasks inside backend/tasks/
+celery.autodiscover_tasks([
+    "backend.tasks"
+])
 
+# Global configuration
+celery.conf.update(
+    timezone="Asia/Kolkata",
+    enable_utc=True,
+)
 
-
+# Beat schedule (run poller every minute)
 celery.conf.beat_schedule = {
-    # daily reminders: run every day at 18:00 IST (example). We'll personalize times per user in the task.
-    'daily_reminder_cron': {
-        'task': 'tasks.daily_reminder_runner',
-        'schedule': crontab(minute=0, hour=12),  # run every day at 12:00 UTC (18:30 IST approx) adjust as needed
-    },
-    # monthly reports: run on the 1st of every month at 02:00 IST (example)
-    'monthly_report_cron': {
-        'task': 'tasks.monthly_report_runner',
-        'schedule': crontab(minute=0, hour=20, day_of_month='1'),  # adjust for UTC->IST etc.
+    "poll-rules-every-minute": {
+        "task": "backend.tasks.tasks.poll_rules",
+        "schedule": 60.0,
     },
 }
 
+# Force import modules so tasks actually register
+import backend.tasks.tasks
+import backend.tasks.scheduled_tasks
+import backend.tasks.export_tasks
 
-# Integrate Celery with Flask when needed, but tasks can import the DB session via your app factory pattern.
-
-#NOTE: We schedule a runner which then checks users' preferred reminder times. This avoids scheduling one task per user in beat.
+print("Celery app loaded — task modules imported.")
