@@ -32,11 +32,16 @@ const routes = [
   { path: "/admin/summary", component: Summary, meta: { requiresAuth: true, role: "admin" } },
   { path: "/search", component: Search, meta: { requiresAuth: true, role: "admin" } },
 
+  // { path: "/tasks", component: TaskDashboard, meta: { requiresAuth: true }   },
+
+  { path: "/tasks", component: () => import("../components/TaskDashboard.vue") },
+
+
   //  Catch-all: redirect any unknown URL (e.g., /api/login) 
   { path: "/:pathMatch(.*)*", redirect: "/" }
 ];
 
-export  const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(),
   routes,
 });

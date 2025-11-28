@@ -5,7 +5,7 @@ import io
 from datetime import datetime, timedelta,timezone
 from celery import shared_task
 from sqlalchemy import func
-from celery_app import celery
+from celery_utils import celery
 from backend.app import create_app, db  # adapt to your app factory
 from backend.models import User, ParkingLot, Reservation, ParkingSpot
 from jinja2 import Template

@@ -58,6 +58,9 @@
               Reminder Logs
             </RouterLink>
           </li>
+          <li class="nav-item">
+            <RouterLink class="nav-link" to="/tasks">Tasks</RouterLink>
+          </li>
         </ul>
       </template>
 
@@ -189,7 +192,7 @@ const welcomeText = computed(() => {
   if (!isLoggedIn.value) {
     return "Welcome, Guest"
   }
-  return isAdmin.value ? "Welcome to Admin" : userName.value + "'s Dashboard";
+  return userName.value + "'s Dashboard";
 })
 
 watch([startDate, endDate], () => {
