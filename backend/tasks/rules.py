@@ -3,7 +3,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 from zoneinfo import ZoneInfo
 
-from backend.celery import celery
+from backend.celery_instance import celery
+
+
 from backend.extensions import db
 from backend.models import (
     User, Rule, ParkingLot, Reservation,

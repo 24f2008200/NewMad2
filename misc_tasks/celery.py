@@ -1,6 +1,6 @@
 # backend/celery.py
 
-from backend.celery_utils import celery, init_celery
+from backend.celery_app import celery, init_celery
 from backend.app import create_app
 
 # Only load Flask app when Celery worker/beat imports this file

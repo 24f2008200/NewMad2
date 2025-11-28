@@ -31,10 +31,11 @@ def create_app():
     CORS(app,
          resources={r"/*": {"origins": app.config["CORS_ORIGINS"]}},
          supports_credentials=True,
-         allow_headers=["Content-Type", "Authorization", "X-Requested-With"])
+         allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
     # ------------------------------
-    # Cache (Redis or SimpleCache)
+    # Cache (Redis or SimpleCache)supports_credentials=True,
     # ------------------------------
     cache.init_app(app)
 
@@ -52,22 +53,24 @@ def create_app():
     from backend.routes.admin_routes import admin_bp
     from backend.routes.user_routes import user_bp
     from backend.diagnostics import diagnostics_bp
-    from backend.api.tasks import bp as tasks_api
-    from backend.api.task_actions import bp as task_actions_bp
+    from backend.api.tasks import api_bp as tasks_api
+    from backend.api.task_actions import task_actions_bp as task_actions_bp
 
     app.register_blueprint(diagnostics_bp, url_prefix="/api/admin")
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(user_bp)
-    app.register_blueprint(tasks_api, url_prefix="/api")
-    app.register_blueprint(task_actions_bp, url_prefix="/api")
+    app.register_blueprint(tasks_api)
+    app.register_blueprint(task_actions_bp)
 
     print("Blueprints registered.")
 
     # ------------------------------
     # Celery ← bind to Flask app
     # ------------------------------ 
-    from .celery_utils import init_celery
+    # from .celery_utils import init_celery
+    from backend.celery_setup import init_celery
+    from backend.celery_instance import celery
     init_celery(app)
     print("Celery initialized.")
 
@@ -84,4 +87,4 @@ if __name__ == "__main__":
     port = int(Config.__dict__.get("FLASK_PORT", 5000))
     print (f"Starting Flask app on port {port}...")
     print("CORS_ORIGINS =", app.config["CORS_ORIGINS"])
-    app.run(debug=True, port=port, use_reloader=True)
+    app.run(debug=False, port=port, use_reloader=True)

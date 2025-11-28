@@ -1,13 +1,10 @@
 # backend/celery_app.py
 
+from backend.celery_instance import celery
+from backend.celery_setup import init_celery
 from backend.app import create_app
-from backend.celery_utils import celery, init_celery
 
-# Create Flask app
-app = create_app()
+flask_app = create_app()
+init_celery(flask_app)
 
-# Bind Celery to Flask
-init_celery(app)
-
-# Export Celery instance for worker
 __all__ = ("celery",)

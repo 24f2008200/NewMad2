@@ -9,9 +9,9 @@ from celery import shared_task
 from backend.celery_app import celery
 from backend.app import create_app, db,my_app
 from backend.models import User, ParkingLot, Reservation,ReminderJob
-from backend.tasks.mail_utils import send_email
-from backend.tasks.chat_utils import send_google_chat
-from backend.tasks.user_queries import users_to_remind, users_with_new_parking_lot, build_reminder_message
+from backend.services.mail_utils import send_email
+from backend.services.chat_utils import send_google_chat
+from backend.services.user_queries import users_to_remind, users_with_new_parking_lot, build_reminder_message
 from pytz import timezone, utc
 
 

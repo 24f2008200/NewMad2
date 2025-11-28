@@ -1,4 +1,6 @@
-from backend.celery import celery
+# backend/tasks/misc.py
+from backend.celery_instance import celery
+
 
 @celery.task
 def test_add(x, y):

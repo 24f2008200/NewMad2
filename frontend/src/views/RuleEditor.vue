@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import apiClient from "@/apiClient"
 import { ref, reactive, computed } from "vue";
 
 export default {
@@ -136,9 +136,9 @@ export default {
     async function save() {
       try {
         if (isEdit.value) {
-          await axios.put(`/api/admin/rules/${props.ruleId}`, form);
+          await apiClient.put(`/admin/rules/${props.ruleId}`, form);
         } else {
-          await axios.post(`/api/admin/rules`, form);
+          await apiClient.post(`/admin/rules`, form);
         }
         alert("Saved");
       } catch (e) {
@@ -148,7 +148,7 @@ export default {
 
     async function preview() {
       try {
-        const resp = await axios.post(`/api/admin/preview_rule/${props.ruleId || 0}`, { limit: 10 });
+        const resp = await apiClient.post(`/admin/preview_rule/${props.ruleId || 0}`, { limit: 10 });
         previewResult.value = resp.data;
       } catch (e) {
         // if creating new (no id) send payload to preview endpoint that accepts a rule object?

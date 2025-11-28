@@ -2,12 +2,15 @@
 from datetime import datetime, timedelta, timezone
 from pytz import timezone as pytz_tz
 
-from backend.celery import celery
+from backend.celery_instance import celery
+
+
+
 from backend.extensions import db
 from backend.models import User, Reservation, ParkingLot, ReminderJob
-from backend.tasks.mail_utils import send_email
-from backend.tasks.chat_utils import send_google_chat
-from backend.tasks.user_queries import build_reminder_message
+from backend.services.mail_utils import send_email
+from backend.services.chat_utils import send_google_chat
+from backend.services.user_queries import build_reminder_message
 
 
 IST = pytz_tz("Asia/Kolkata")

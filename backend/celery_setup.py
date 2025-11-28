@@ -1,11 +1,8 @@
-# backend/celery_utils.py
+# backend/celery_setup.py
 
-def init_celery(celery, app):
-    """
-    Bind Celery instance to Flask application.
-    Called ONLY from celery_app.py.
-    """
+from backend.celery_instance import celery
 
+def init_celery(app):
     celery.conf.update(
         broker_url=app.config["CELERY_BROKER_URL"],
         result_backend=app.config["CELERY_RESULT_BACKEND"],
@@ -16,7 +13,6 @@ def init_celery(celery, app):
         enable_utc=True,
     )
 
-    # Make Celery tasks run inside Flask context
     class ContextTask(celery.Task):
         def __call__(self, *args, **kwargs):
             with app.app_context():
@@ -24,5 +20,4 @@ def init_celery(celery, app):
 
     celery.Task = ContextTask
 
-    # Autodiscover tasks inside backend/
     celery.autodiscover_tasks(["backend"])

@@ -3,7 +3,9 @@ import os
 import csv
 from datetime import datetime
 
-from backend.celery import celery
+from backend.celery_instance import celery
+
+
 from backend.extensions import db, redis_conn
 from backend.models import Reservation, ParkingSpot, ParkingLot
 from backend.utils.storage import upload_file_to_s3, presigned_url_for_key, S3_PREFIX

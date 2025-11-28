@@ -3,7 +3,7 @@ from flask import Flask
 from .config import Config
 
 # import celery_init AFTER config to avoid circular imports
-from .celery_utils import init_celery, celery
+from .celery_utils import init_celery
 
 
 def create_app():

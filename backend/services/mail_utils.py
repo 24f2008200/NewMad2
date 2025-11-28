@@ -1,4 +1,4 @@
-# backend/tasks/mail_utils.py
+# backend/services/mail_utils.py
 import os
 import smtplib
 from email.message import EmailMessage

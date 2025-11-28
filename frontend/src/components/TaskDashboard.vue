@@ -205,6 +205,6 @@ function closeRunModal() {
 
 onMounted(() => {
   loadTasks();
-  setInterval(loadTasks, 3000);
+  // setInterval(loadTasks, 3000);
 });
 </script>
