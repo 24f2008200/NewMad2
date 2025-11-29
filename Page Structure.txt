@@ -1,0 +1,12 @@
+AdminTaskDashboard.vue
+ ├── Filters (select, date range, status)
+ ├── Indicators Row
+ │     ├── Worker Health (green/red pill)
+ │     ├── Queue Length
+ │     ├── Avg Duration
+ │     └── Success / Failure rate
+ ├── Tasks Table (paginated)
+       ├── progress bar
+       ├── status pill
+       ├── duration
+       └── worker name
