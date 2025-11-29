@@ -2,4 +2,6 @@
 
 from celery import Celery
 
+
+
 celery = Celery("parking_app")

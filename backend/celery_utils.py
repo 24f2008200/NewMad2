@@ -1,5 +1,5 @@
 # backend/celery_utils.py
-
+#not used anymore - moved to celery_setup.py
 def init_celery(celery, app):
     """
     Bind Celery instance to Flask application.
@@ -25,4 +25,4 @@ def init_celery(celery, app):
     celery.Task = ContextTask
 
     # Autodiscover tasks inside backend/
-    celery.autodiscover_tasks(["backend"])
+    celery.autodiscover_tasks(["tasks"])

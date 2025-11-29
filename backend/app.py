@@ -55,6 +55,7 @@ def create_app():
     from backend.diagnostics import diagnostics_bp
     from backend.api.tasks import api_bp as tasks_api
     from backend.api.task_actions import task_actions_bp as task_actions_bp
+    from backend.api.dashboard import dashboard_bp as dashboard_bp
 
     app.register_blueprint(diagnostics_bp, url_prefix="/api/admin")
     app.register_blueprint(auth_bp)
@@ -62,6 +63,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(tasks_api)
     app.register_blueprint(task_actions_bp)
+    app.register_blueprint(dashboard_bp)
 
     print("Blueprints registered.")
 

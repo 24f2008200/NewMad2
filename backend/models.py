@@ -558,3 +558,31 @@ class ExportJob(MyModel):
 #   ]
 # }
 
+
+
+
+
+class TaskRecord(MyModel):
+    __tablename__ = "task_records"
+    # id = db.Column(db.String(64), primary_key=True)   # celery task id
+    name = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.String(32), nullable=False, index=True)  # PENDING, RUNNING, SUCCESS, FAILED, REVOKED
+    worker = db.Column(db.String(128), nullable=True, index=True)
+    start_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime, nullable=True)
+    duration = db.Column(db.Float, nullable=True)  # seconds
+    progress = db.Column(db.Integer, nullable=True, default=0)  # 0-100
+    # created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    # last_update = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "status": self.status,
+            "worker": self.worker,
+            "start_time": self.start_time.isoformat() if self.start_time else None,
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "duration": round(self.duration, 3) if self.duration is not None else None,
+            "progress": int(self.progress) if self.progress is not None else 0,
+        }

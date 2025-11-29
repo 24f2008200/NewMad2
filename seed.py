@@ -34,7 +34,7 @@ default_google_chat_webhook = os.getenv(
     "https://example.invalid/webhook"  # placeholder if not provided
 )
 
-app = create_app(False, size)
+app = create_app()
 
 with app.app_context():
 
