@@ -1,210 +1,169 @@
 <template>
-  <div class="container mt-4">
+  <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3>Celery Task Dashboard</h3>
+    <!-- Filters -->
+    <div class="card mb-3">
+      <div class="card-body d-flex flex-wrap gap-3 align-items-end">
 
-      <div>
-        <button class="btn btn-success me-2" @click="openRunModal">
-          Run Task
-        </button>
+        <div>
+          <label>Status</label>
+          <select v-model="filters.status" class="form-control" @change="fetchTasks">
+            <option value="">All</option>
+            <option>SUCCESS</option>
+            <option>FAILED</option>
+            <option>RUNNING</option>
+            <option>PENDING</option>
+          </select>
+        </div>
 
-        <button class="btn btn-primary" @click="loadTasks">
-          Refresh
-        </button>
+        <div>
+          <label>Worker</label>
+          <select v-model="filters.worker" class="form-control" @change="fetchTasks">
+            <option value="">All</option>
+            <option v-for="w in workerList" :key="w">{{ w }}</option>
+          </select>
+        </div>
+
       </div>
     </div>
 
-    <input class="form-control mb-3" v-model="search" placeholder="Search tasks…" />
+    <!-- Metrics -->
+    <div class="row mb-3">
 
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Status</th>
-          <th>Result</th>
-          <th>Time</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr v-for="task in filteredTasks" :key="task.id">
-          <td style="max-width:150px; word-break: break-all">{{ task.id }}</td>
-
-          <td>
-            <span :class="statusClass(task.status)">{{ task.status }}</span>
-          </td>
-
-          <td>{{ summary(task.result) }}</td>
-          <td>{{ task.date_done || "—" }}</td>
-
-          <td>
-            <button class="btn btn-sm btn-outline-secondary me-1"
-                    @click="openModal(task)">
-              View
-            </button>
-
-            <button v-if="isCancelable(task.status)"
-                    class="btn btn-sm btn-danger"
-                    @click="cancel(task.id)">
-              Cancel
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Task Details Modal -->
-    <div class="modal fade" ref="modal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
-          <div class="modal-header">
-            <h5 class="modal-title">Task Details</h5>
-            <button class="btn-close" @click="closeModal"></button>
-          </div>
-
-          <div class="modal-body">
-            <pre>{{ selectedTask }}</pre>
-          </div>
-
+      <!-- Worker Health -->
+      <div class="col-md-3" v-for="(state, worker) in metrics.workers" :key="worker">
+        <div class="card p-3 text-center">
+          <h6>{{ worker }}</h6>
+          <span :class="['badge', state === 'online' ? 'badge bg-success' : 'badge bg-danger']">
+            {{ state }}
+          </span>
         </div>
       </div>
+
+      <!-- Queue Length -->
+      <div class="col-md-3">
+        <div class="card p-3 text-center">
+          <h6>Queue Length</h6>
+          <h4>{{ metrics.queue_length }}</h4>
+        </div>
+      </div>
+
+      <!-- Avg Duration -->
+      <div class="col-md-3">
+        <div class="card p-3 text-center">
+          <h6>Avg Task Duration</h6>
+          <h4>{{ metrics.avg_task_duration }}s</h4>
+        </div>
+      </div>
+
+      <!-- Success Rate -->
+      <div class="col-md-3">
+        <div class="card p-3 text-center">
+          <h6>Success Rate</h6>
+          <h4>{{ (metrics.success_rate * 100).toFixed(1) }}%</h4>
+        </div>
+      </div>
+
     </div>
 
-    <!-- RUN TASK MODAL -->
-    <div class="modal fade" ref="runModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
+    <!-- Task Table -->
+    <div class="card">
+      <div class="card-body p-0">
 
-          <div class="modal-header">
-            <h5 class="modal-title">Run a Task</h5>
-            <button class="btn-close" @click="closeRunModal"></button>
-          </div>
+        <table class="table mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th>Progress</th>
+              <th>Worker</th>
+            </tr>
+          </thead>
 
-          <div class="modal-body">
+          <tbody>
+            <tr v-for="t in tasks" :key="t.id">
+              <td>{{ t.name }}</td>
 
-            <div class="mb-3">
-              <label class="form-label">Task Name (Dot path)</label>
-              <input class="form-control" v-model="taskName"
-                     placeholder="backend.tasks.rules.run_rule" />
-            </div>
+              <td>
+                <span :class="statusClass(t.status)">
+                  {{ t.status }}
+                </span>
+              </td>
 
-            <div class="mb-3">
-              <label class="form-label">Args (JSON array)</label>
-              <input class="form-control" v-model="taskArgs" placeholder='[1, 2, 3]' />
-            </div>
+              <td>{{ t.duration }}s</td>
 
-            <div class="mb-3">
-              <label class="form-label">Kwargs (JSON dict)</label>
-              <input class="form-control" v-model="taskKwargs" placeholder='{"x":1}' />
-            </div>
+              <td style="width: 200px">
+                <div class="progress">
+                  <div class="progress-bar"
+                       role="progressbar"
+                       :style="{ width: t.progress + '%' }">
+                  </div>
+                </div>
+              </td>
 
-          </div>
+              <td>{{ t.worker }}</td>
+            </tr>
+          </tbody>
 
-          <div class="modal-footer">
-            <button class="btn btn-secondary" @click="closeRunModal">Close</button>
-            <button class="btn btn-success" @click="runTaskNow">
-              Run
-            </button>
-          </div>
+        </table>
 
-        </div>
       </div>
     </div>
 
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import taskService from "../services/taskService";
+import { ref, onMounted } from "vue";
 
 const tasks = ref([]);
-const search = ref("");
-const selectedTask = ref(null);
+const metrics = ref({
+  workers: {},
+  queue_length: 0,
+  avg_task_duration: 0,
+  success_rate: 0
+});
 
-const modal = ref(null);
-const runModal = ref(null);
+const workerList = ref([]);
 
-const taskName = ref("");
-const taskArgs = ref("[]");
-const taskKwargs = ref("{}");
+const filters = ref({
+  status: "",
+  worker: ""
+});
 
-
-async function loadTasks() {
-  tasks.value = await taskService.getAll();
+async function fetchMetrics() {
+  const res = await fetch("/api/metrics");
+  const json = await res.json();
+  metrics.value = json;
+  workerList.value = Object.keys(json.workers);
 }
 
-// Cancel
-async function cancel(id) {
-  await taskService.cancelTask(id);
-  loadTasks();
-}
-
-function isCancelable(status) {
-  return ["PENDING", "RECEIVED", "STARTED", "RETRY"].includes(status);
-}
-
-// Run Task manually
-async function runTaskNow() {
-  try {
-    const args = JSON.parse(taskArgs.value || "[]");
-    const kwargs = JSON.parse(taskKwargs.value || "{}");
-
-    const res = await taskService.runTask(taskName.value, args, kwargs);
-    alert("Task started: " + res.task_id);
-
-    closeRunModal();
-    loadTasks();
-  } catch (e) {
-    alert("Invalid JSON");
-  }
-}
-
-// Helpers
-const filteredTasks = computed(() =>
-  tasks.value.filter(
-    t =>
-      t.id.toLowerCase().includes(search.value.toLowerCase()) ||
-      t.status.toLowerCase().includes(search.value.toLowerCase())
-  )
-);
-
-function summary(result) {
-  if (!result) return "—";
-  let s = JSON.stringify(result);
-  return s.length > 30 ? s.substring(0, 30) + "..." : s;
+async function fetchTasks() {
+  const params = new URLSearchParams(filters.value).toString();
+  const res = await fetch(`/api/tasks?${params}`);
+  const json = await res.json();
+  tasks.value = json.tasks;
 }
 
 function statusClass(status) {
-  if (status === "SUCCESS") return "badge bg-success";
-  if (status === "FAILURE") return "badge bg-danger";
-  if (status === "PENDING") return "badge bg-warning text-dark";
-  return "badge bg-secondary";
-}
-
-// Modals
-function openModal(task) {
-  selectedTask.value = JSON.stringify(task, null, 2);
-  $(modal.value).modal("show");
-}
-
-function closeModal() {
-  $(modal.value).modal("hide");
-}
-
-function openRunModal() {
-  $(runModal.value).modal("show");
-}
-
-function closeRunModal() {
-  $(runModal.value).modal("hide");
+  return {
+    SUCCESS: "badge bg-success",
+    FAILED: "badge bg-danger",
+    RUNNING: "badge bg-warning text-dark",
+    PENDING: "badge bg-secondary"
+  }[status] || "badge bg-light";
 }
 
 onMounted(() => {
-  loadTasks();
-  // setInterval(loadTasks, 3000);
+  fetchMetrics();
+  fetchTasks();
+
+  // Auto-refresh every 5 seconds
+  setInterval(() => {
+    fetchMetrics();
+    fetchTasks();
+  }, 5000);
 });
 </script>

@@ -34,7 +34,9 @@ const routes = [
 
   // { path: "/tasks", component: TaskDashboard, meta: { requiresAuth: true }   },
 
-  { path: "/tasks", component: () => import("../components/TaskDashboard.vue") },
+  { path: "/tasks", component: () => import("../components/CeleryTaskDashboard.vue") },
+  { path: "/reminders", component: () => import("../components/ReminderRuleAdmin.vue") },
+  // { path: "/reminders", component: () => import("../components/AdminReminderRules.vue") },
 
 
   //  Catch-all: redirect any unknown URL (e.g., /api/login) 

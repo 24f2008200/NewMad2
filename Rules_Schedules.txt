@@ -1,0 +1,18 @@
+Admin Makes rules using (ReminderRulesAdmin) - stored in ReminderRules by routes/admin_rules /api/admin/rules....
+Beat scans every hour (tasks.schedule_daily_reminders) the ReminderRules and filters eligible candidates and puts them in 
+ReminderJob to be executed.
+Beat also schedules every minute execution (tasks.process_reminders) -> service.reminder_service- which reads 
+ReminderJob and if the time to recieve matches sends the mail & mars it done.
+
+ReminderRulesAdmin can show the pending Rules waiting to be executed. If Admin chooses to execute 
+imediately, it gets executed. without waiting for the beat.
+
+contents of ReminderJob - pending messeges to be delivered - waiting for theright time - can be seen in console
+
+Other scheduled tasks by beat waiting for execution can also be seen in the tasks tab.
+
+
+
+
+
+ 

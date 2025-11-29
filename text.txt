@@ -28,14 +28,28 @@ To check if it’s running:     redis-cli ping
 To stop Redis:   sudo service redis-server stop
 # or
 redis-cli shutdown
+==============================
+copy files:
+SRC=/i/IIT/Term5/Projects/NewMad2
+DEST=/i/IIT/Term5/Projects/Test
 
-
-
+find "$SRC" \
+  -path "*/.*" -prune -o \
+  -type f \( -name "*.py" -o -name "*.vue" -o -name "*.js" -o -name "*.html" -o -name "*.txt" \) \
+  -exec sh -c '
+    rel="${1#'"$SRC"'/}"
+    mkdir -p "'"$DEST"'"/"$(dirname "$rel")"
+    cp -f "$1" "'"$DEST"'"/"$rel"
+  ' sh {} \;
+============================
 
 pip install redis flask-caching
 
 python -m init_db
 python -m init_db2
+
+
+redis-cli ping   -----> PONG if it is running
 
 
 

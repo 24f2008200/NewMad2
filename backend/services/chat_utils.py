@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 default_google_chat_webhook = os.getenv("GOOGLE_CHAT_HOOK" ,"")
 
 
-def send_google_chat(text ,webhook_url = default_google_chat_webhook):
+def send_chat(text ,webhook_url = default_google_chat_webhook):
     """Send a message to a Google Chat space using webhook."""
     payload = {"text": text}
     try:

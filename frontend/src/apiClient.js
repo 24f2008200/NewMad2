@@ -64,7 +64,7 @@ async function request(url, options = {}) {
 
     // Detect content type
     const contentType = res.headers.get("Content-Type") || "";
-
+console.log("apiClient Content-Type:", contentType);
     // If PDF or any binary
     if (contentType.includes("application/pdf")) {
         return await res.blob();

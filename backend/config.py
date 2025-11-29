@@ -81,6 +81,18 @@ class Config:
     CELERY_TIMEZONE = "Asia/Kolkata"
     CELERY_ENABLE_UTC = True
 
+    CELERY_BEAT_SCHEDULE_FILENAME = os.getenv("CELERY_BEAT_SCHEDULE_FILENAME", "celerybeat-schedule")   
+    
+
+    # -------------------------------
+    # Reminder Service Settings
+    # -------------------------------
+    
+    DAILY_REMINDER_CRON_HOUR = int(os.getenv("DAILY_REMINDER_CRON_HOUR", 0))
+    DAILY_REMINDER_CRON_MINUTE = int(os.getenv("DAILY_REMINDER_CRON_MINUTE", 0))
+
+    PROCESS_REMINDERS_SECONDS = float(os.getenv("PROCESS_REMINDERS_SECONDS", 60))
+
     # -------------------------------
     # Storage / S3 (used in exports)
     # -------------------------------

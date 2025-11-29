@@ -23,6 +23,9 @@ def create_app():
 
     # Load EVERYTHING from config.py
     app.config.from_object(Config)
+    for key, value in app.config.items():
+        print(key, "=", value)
+
 
     # ------------------------------
     # CORS
@@ -56,6 +59,7 @@ def create_app():
     from backend.api.tasks import api_bp as tasks_api
     from backend.api.task_actions import task_actions_bp as task_actions_bp
     from backend.api.dashboard import dashboard_bp as dashboard_bp
+    from backend.routes.admin_rules import rules_bp 
 
     app.register_blueprint(diagnostics_bp, url_prefix="/api/admin")
     app.register_blueprint(auth_bp)
@@ -64,13 +68,14 @@ def create_app():
     app.register_blueprint(tasks_api)
     app.register_blueprint(task_actions_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(rules_bp)
 
     print("Blueprints registered.")
 
     # ------------------------------
     # Celery ← bind to Flask app
     # ------------------------------ 
-    # from .celery_utils import init_celery
+    # from .celery_utils import init_celery 
     from backend.celery_setup import init_celery
     from backend.celery_instance import celery
     init_celery(app)

@@ -1,6 +1,8 @@
+from backend.services.rule_engine import process_due_rules
 from celery import shared_task
 import time
 import random
+from backend.services.reminder_service import create_daily_reminder_jobs, process_due_reminders
 
 @shared_task(bind=True,name="tasks.demo_task")
 def demo_task(self):
@@ -19,3 +21,20 @@ def demo_fail(self):
     if random.random() < 0.3:
         raise Exception("Random failure")
     return "ok"
+
+@shared_task(name="tasks.schedule_daily_reminders")
+def schedule_daily_reminders():
+    return process_due_rules()
+
+@shared_task(name="tasks.schedule_hourly_reminders")
+def schedule_hourly_reminders():
+    return process_due_rules()
+
+@shared_task(name="tasks.process_reminders")
+def process_reminders():
+    """
+    Runs every minute.
+    Sends reminders that are now due.
+    """
+    return process_due_reminders()
+

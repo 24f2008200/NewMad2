@@ -1,0 +1,1 @@
+Fully working Flask + Celery + Beat + Signals demo.

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from celery.result import AsyncResult
 from backend.celery_instance import celery
+from backend.models import TaskRecord
 
 api_bp = Blueprint("tasks_api", __name__, url_prefix="/api/tasks")
 
@@ -11,11 +12,34 @@ api_bp = Blueprint("tasks_api", __name__, url_prefix="/api/tasks")
 @api_bp.get("")
 def list_tasks():
     """
+    Return all tasks stored in DB for your dashboard table.
+    """
+    rows = TaskRecord.query.order_by(TaskRecord.created_at.desc()).limit(200).all()
+
+    data = []
+    for r in rows:
+        data.append({
+            "id": r.id,
+            "name": r.name,
+            "status": r.status,
+            "worker": r.worker,
+            "start_time": r.start_time.isoformat() if r.start_time else None,
+            "end_time": r.end_time.isoformat() if r.end_time else None,
+            "duration": r.duration,
+            "progress": r.progress,
+        })
+
+    return jsonify({"tasks": data})
+
+
+def list_tasks_backend():
+    """
     Lists all Celery tasks currently stored in the result backend.
     Guaranteed safe because we use celery.backend.get_all().
     """
 
     backend = celery.backend
+    print(f"Backend type: {type(backend)}")
 
     # Celery >=5 provides this API, if Redis/DB backend supports it.
     # For Redis it works well.
@@ -23,6 +47,7 @@ def list_tasks():
         stored = backend._get_all()   # private but stable for Celery 5.x
     except:
         stored = {}
+    print(f"Stored tasks: {len(stored)}")
 
     tasks = []
     for task_id, meta in stored.items():

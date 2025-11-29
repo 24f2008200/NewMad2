@@ -382,6 +382,8 @@ class ReminderJob(MyModel):
     scheduled_at = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default="pending")
     sent_at = db.Column(db.DateTime, nullable=True)
+    message = db.Column(db.String(512), nullable=True)
+    action = db.Column(db.String(64), nullable=True)  # e.g. "send_reminder"    
 
 
 def model_to_dict(obj):
@@ -531,6 +533,31 @@ class ExportJob(MyModel):
     result_url = Column(String(1024))
     error = Column(Text)
 
+class ReminderRule(db.Model):
+    __tablename__ = "reminder_rules"
+
+    id = db.Column(db.Integer, primary_key=True)
+    rule_name = db.Column(db.String(255), nullable=False)
+
+    # Behavior of the rule
+    trigger_type = db.Column(db.String(64), nullable=False)
+    message_template = db.Column(db.String(512), nullable=False)
+    params = db.Column(db.JSON, nullable=True)  # <---- optional but useful
+
+    # When the rule runs
+    schedule_type = db.Column(db.String(32), default="daily") 
+    cron_expr = db.Column(db.String(64), nullable=True)  
+    time_of_day = db.Column(db.String(5), nullable=True)  
+
+    message_template = db.Column(db.String(512), nullable=True)
+    action = db.Column(db.String(64), nullable=False)  # e.g. "send_reminder" 
+
+    last_run_at = db.Column(db.DateTime, nullable=True)
+    next_run_at = db.Column(db.DateTime, nullable=True)
+
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 # --- End: Rule and Job models ---
 
 
@@ -562,18 +589,26 @@ class ExportJob(MyModel):
 
 
 
-class TaskRecord(MyModel):
+class TaskRecord(db.Model):
     __tablename__ = "task_records"
-    # id = db.Column(db.String(64), primary_key=True)   # celery task id
+    id = db.Column(db.String(64), primary_key=True)   # celery task id
     name = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(32), nullable=False, index=True)  # PENDING, RUNNING, SUCCESS, FAILED, REVOKED
     worker = db.Column(db.String(128), nullable=True, index=True)
-    start_time = db.Column(db.DateTime, nullable=True)
-    end_time = db.Column(db.DateTime, nullable=True)
+    start_time = db.Column(db.DateTime(timezone=True), nullable=True)
+    end_time   = db.Column(db.DateTime(timezone=True), nullable=True)
+
     duration = db.Column(db.Float, nullable=True)  # seconds
     progress = db.Column(db.Integer, nullable=True, default=0)  # 0-100
-    # created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
-    # last_update = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+    updated_at = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
     def to_dict(self):
         return {

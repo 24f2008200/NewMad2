@@ -9,7 +9,7 @@ from backend.celery_instance import celery
 from backend.extensions import db
 from backend.models import User, Reservation, ParkingLot, ReminderJob
 from backend.services.mail_utils import send_email
-from backend.services.chat_utils import send_google_chat
+from backend.services.chat_utils import send_chat
 from backend.services.user_queries import build_reminder_message
 
 
@@ -92,7 +92,7 @@ def send_user_reminder(user_id, action):
     channels = action.get("channels", ["gchat"])
 
     if "gchat" in channels and u.google_chat_webhook:
-        send_google_chat(u.google_chat_webhook, msg)
+        send_chat(msg, u.google_chat_webhook)
 
     if "email" in channels:
         send_email(u.email, "Parking Reminder", f"<p>{msg}</p>")
